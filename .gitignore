@@ -1,0 +1,5 @@
+.sops.yaml
+*.backup
+vault-password
+kubeconfig
+k8s-old

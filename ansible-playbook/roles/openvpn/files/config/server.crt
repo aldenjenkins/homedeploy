@@ -1,0 +1,94 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 1 (0x1)
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=IL, ST=Israel, L=Tel Aviv Yafo, O=HomeNet, OU=HomeNet, CN=HomeNet-RootCA/emailAddress=dmitrykuzn@gmail.com
+        Validity
+            Not Before: Jun 24 08:56:48 2018 GMT
+            Not After : Jun 21 08:56:48 2028 GMT
+        Subject: C=IL, ST=Israel, L=Tel Aviv Yafo, O=HomeNet, OU=HomeNet, CN=krang-openvpn/emailAddress=dmitrykuzn@gmail.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:94:f1:61:88:93:52:9b:e8:cd:69:03:1a:6a:3e:
+                    28:45:c4:24:d6:a9:57:01:a3:bc:7c:30:4c:97:ed:
+                    82:90:96:ee:ce:20:36:5b:11:ec:91:57:9b:bb:db:
+                    d3:52:d1:8e:ae:c9:42:db:7d:dd:ed:2a:ec:7d:d8:
+                    9e:a4:a0:00:4e:8d:73:eb:a7:8a:0b:14:53:5f:64:
+                    7b:be:74:0e:97:aa:a3:b0:ab:4a:0c:66:22:f0:07:
+                    3e:70:20:e3:2a:6a:90:bb:82:3e:9c:ac:73:7b:0f:
+                    8e:7a:3a:1a:6f:29:13:d1:66:b9:aa:4a:d1:a6:5c:
+                    ba:74:1f:39:47:9b:e8:d6:e8:f0:0b:64:00:58:be:
+                    64:f4:ed:6e:4e:9a:0e:bc:04:bf:af:a1:12:bc:e6:
+                    4e:23:49:b7:db:bf:45:a0:63:4a:da:7a:41:dd:94:
+                    bb:b6:1f:14:96:21:80:70:fc:53:f6:ae:a3:bc:6d:
+                    95:99:8b:ea:a1:5f:bd:7c:03:5f:e6:1c:fa:a5:b6:
+                    31:50:22:e9:93:4c:80:5a:30:06:1c:4b:fe:dd:47:
+                    f0:1b:40:01:ed:72:0a:f9:eb:e4:d5:6b:b3:4f:e6:
+                    15:9a:62:4b:bd:aa:68:26:fb:96:16:aa:9b:32:f3:
+                    0d:f0:97:b2:3e:6c:49:28:21:9b:d8:c4:49:63:85:
+                    23:dd
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            X509v3 Subject Key Identifier: 
+                2A:D3:7B:82:D8:0F:B8:82:AF:E5:05:3E:9F:1D:E5:93:B8:B7:AC:19
+            X509v3 Authority Key Identifier: 
+                keyid:BB:E0:12:A7:51:FE:6C:C2:45:D4:05:09:13:97:21:31:F2:3D:E8:61
+                DirName:/C=IL/ST=Israel/L=Tel Aviv Yafo/O=HomeNet/OU=HomeNet/CN=HomeNet-RootCA/emailAddress=dmitrykuzn@gmail.com
+                serial:B6:1E:38:65:01:1B:3D:65
+
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+            X509v3 Subject Alternative Name: 
+                DNS:krang-openvpn
+    Signature Algorithm: sha256WithRSAEncryption
+         4e:43:41:1b:f1:48:e6:7c:f8:74:4c:e7:12:a5:28:a4:4e:56:
+         17:cd:57:7d:fd:50:38:b9:4a:9a:2e:ac:2b:fa:7f:6d:7a:4a:
+         da:23:b3:69:96:d9:8a:07:d8:30:0a:4e:68:ab:16:f6:c8:b5:
+         a6:44:9d:db:62:f1:d9:f9:1f:e6:32:2e:84:50:68:18:e9:97:
+         1c:71:32:e3:7b:2b:df:18:59:df:96:61:91:6d:db:93:cf:02:
+         cd:53:a6:49:aa:71:e6:b8:26:26:b2:6c:fb:eb:41:b4:87:37:
+         6d:70:ef:14:d3:73:a6:13:a4:3c:26:80:06:e7:e0:06:f5:7a:
+         08:f2:31:b8:af:90:0a:97:c9:50:a7:71:1e:12:9e:7d:70:2a:
+         ae:75:ec:c2:f6:9d:3e:e5:70:73:80:cf:c0:55:f2:10:c8:7d:
+         ee:d3:3a:c2:ab:0f:53:96:b6:cb:40:0d:94:d8:64:f3:bf:2f:
+         2e:03:05:82:8e:29:ba:50:c5:d7:c8:e3:92:99:53:0e:db:80:
+         56:5b:42:7d:f2:b8:5b:28:a8:56:b5:dd:85:23:9f:7e:15:8b:
+         b1:57:a3:d9:15:29:36:4b:9d:b9:53:57:84:fb:d6:67:70:64:
+         1d:25:58:5e:8e:bf:cf:88:e8:0d:80:2d:9f:f6:f2:dd:18:9b:
+         eb:84:92:26
+-----BEGIN CERTIFICATE-----
+MIIE6DCCA9CgAwIBAgIBATANBgkqhkiG9w0BAQsFADCBmDELMAkGA1UEBhMCSUwx
+DzANBgNVBAgMBklzcmFlbDEWMBQGA1UEBwwNVGVsIEF2aXYgWWFmbzEQMA4GA1UE
+CgwHSG9tZU5ldDEQMA4GA1UECwwHSG9tZU5ldDEXMBUGA1UEAwwOSG9tZU5ldC1S
+b290Q0ExIzAhBgkqhkiG9w0BCQEWFGRtaXRyeWt1em5AZ21haWwuY29tMB4XDTE4
+MDYyNDA4NTY0OFoXDTI4MDYyMTA4NTY0OFowgZcxCzAJBgNVBAYTAklMMQ8wDQYD
+VQQIDAZJc3JhZWwxFjAUBgNVBAcMDVRlbCBBdml2IFlhZm8xEDAOBgNVBAoMB0hv
+bWVOZXQxEDAOBgNVBAsMB0hvbWVOZXQxFjAUBgNVBAMMDWtyYW5nLW9wZW52cG4x
+IzAhBgkqhkiG9w0BCQEWFGRtaXRyeWt1em5AZ21haWwuY29tMIIBIjANBgkqhkiG
+9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlPFhiJNSm+jNaQMaaj4oRcQk1qlXAaO8fDBM
+l+2CkJbuziA2WxHskVebu9vTUtGOrslC233d7SrsfdiepKAATo1z66eKCxRTX2R7
+vnQOl6qjsKtKDGYi8Ac+cCDjKmqQu4I+nKxzew+OejoabykT0Wa5qkrRply6dB85
+R5vo1ujwC2QAWL5k9O1uTpoOvAS/r6ESvOZOI0m3279FoGNK2npB3ZS7th8UliGA
+cPxT9q6jvG2VmYvqoV+9fANf5hz6pbYxUCLpk0yAWjAGHEv+3UfwG0AB7XIK+evk
+1WuzT+YVmmJLvapoJvuWFqqbMvMN8JeyPmxJKCGb2MRJY4Uj3QIDAQABo4IBOjCC
+ATYwCQYDVR0TBAIwADAdBgNVHQ4EFgQUKtN7gtgPuIKv5QU+nx3lk7i3rBkwgc0G
+A1UdIwSBxTCBwoAUu+ASp1H+bMJF1AUJE5chMfI96GGhgZ6kgZswgZgxCzAJBgNV
+BAYTAklMMQ8wDQYDVQQIDAZJc3JhZWwxFjAUBgNVBAcMDVRlbCBBdml2IFlhZm8x
+EDAOBgNVBAoMB0hvbWVOZXQxEDAOBgNVBAsMB0hvbWVOZXQxFzAVBgNVBAMMDkhv
+bWVOZXQtUm9vdENBMSMwIQYJKoZIhvcNAQkBFhRkbWl0cnlrdXpuQGdtYWlsLmNv
+bYIJALYeOGUBGz1lMBMGA1UdJQQMMAoGCCsGAQUFBwMBMAsGA1UdDwQEAwIFoDAY
+BgNVHREEETAPgg1rcmFuZy1vcGVudnBuMA0GCSqGSIb3DQEBCwUAA4IBAQBOQ0Eb
+8UjmfPh0TOcSpSikTlYXzVd9/VA4uUqaLqwr+n9tekraI7NpltmKB9gwCk5oqxb2
+yLWmRJ3bYvHZ+R/mMi6EUGgY6ZcccTLjeyvfGFnflmGRbduTzwLNU6ZJqnHmuCYm
+smz760G0hzdtcO8U03OmE6Q8JoAG5+AG9XoI8jG4r5AKl8lQp3EeEp59cCqudezC
+9p0+5XBzgM/AVfIQyH3u0zrCqw9TlrbLQA2U2GTzvy8uAwWCjim6UMXXyOOSmVMO
+24BWW0J98rhbKKhWtd2FI59+FYuxV6PZFSk2S525U1eE+9ZncGQdJVhejr/PiOgN
+gC2f9vLdGJvrhJIm
+-----END CERTIFICATE-----

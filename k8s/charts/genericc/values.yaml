@@ -1,0 +1,26 @@
+replicaCount: 1
+
+image:
+  repository: linuxserver/GENERIC
+  tag: latest
+  pullPolicy: Always
+
+hostname: "GENERIC.local"
+service:
+  type: NodePort
+  port: 8888
+  externalTrafficPolicy: Local
+
+probe:
+  initialDelay: 40
+
+env:
+  uid: 0
+  gid: 0
+  timezone: UTC
+
+pvc: ""
+config:
+  subpath: ""
+data:
+  subpath: ""

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: {{ .Values.hostname }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.service.port }}
+    name: http
+    protocol: TCP
+  selector:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}

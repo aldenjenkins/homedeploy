@@ -1,0 +1,128 @@
+environments:
+  default:
+    values:
+      - values.yaml
+    secrets:
+      - secrets.yaml
+
+releases:
+- name: etcd-operator
+  chart: stable/etcd-operator
+  namespace: external-dns
+  values:
+  - deployments:
+      backupOperator: false
+      restoreOperator: false
+    etcdOperator:
+      name: operator
+      image:
+        repository: pando85/etcd-operator
+        tag: v0.9.4
+    etcdCluster:
+      repository: kontenapharos/etcd:3.2.24
+      version: 3.2.24
+- name: etcd-cluster-crd
+  namespace: external-dns
+  chart: incubator/raw
+  values:
+  - resources:
+    - apiVersion: etcd.database.coreos.com/v1beta2
+      kind: EtcdCluster
+      metadata:
+        name: etcd-cluster
+        labels:
+          app: etcd-operator
+      spec:
+        size: 3
+        version: "3.2.24"
+        # FIXME
+        repository: dimakuz/etcd
+- name: etcd-lb
+  namespace: external-dns
+  chart: incubator/raw
+  values:
+  - resources:
+    - apiVersion: v1
+      kind: Service
+      metadata:
+        name: etcd-lb
+        labels:
+          app: etcd
+          etcd_cluster: etcd-cluster
+      spec:
+        selector:
+          app: etcd
+          etcd_cluster: etcd-cluster
+        type: LoadBalancer
+        loadBalancerIP: {{ .Values.services.externaldns.etcd.ip }}
+        ports:
+        - protocol: TCP
+          port: 2379
+- name: coredns
+  chart: stable/coredns
+  namespace: external-dns
+  values:
+    - serviceType: "ClusterIP"
+      servers:
+        - zones:
+          - zone: .
+          port: {{ .Values.services.externaldns.port }}
+          plugins:
+          - name: errors
+          # Serves a /health endpoint on :8080, required for livenessProbe
+          - name: health
+            configBlock: |-
+              lameduck 5s
+          # Serves a /ready endpoint on :8181, required for readinessProbe
+          - name: ready
+          # Serves a /metrics endpoint on :9153, required for serviceMonitor
+          # - name: prometheus
+          #   parameters: 0.0.0.0:9153
+          # - name: forward
+          #   parameters: . /etc/resolv.conf
+          - name: cache
+            parameters: 30
+          # - name: loop
+          - name: reload
+          - name: loadbalance
+          - name: etcd
+            parameters: home.dkuz.net
+            configBlock: |-
+              stubzones
+              path /skydns
+              endpoint {{ .Values.services.externaldns.etcd.ip }}:2379
+- name: coredns-lb
+  namespace: external-dns
+  chart: incubator/raw
+  values:
+  - resources:
+    - apiVersion: v1
+      kind: Service
+      metadata:
+        name: coredns-lb
+        labels:
+          app: coredns
+      spec:
+        selector:
+          app.kubernetes.io/instance: coredns
+          app.kubernetes.io/name: coredns
+          k8s-app: coredns
+        type: LoadBalancer
+        loadBalancerIP: {{ .Values.services.externaldns.ip }}
+        ports:
+        - protocol: UDP
+          port: {{ .Values.services.externaldns.port }}
+- name: external-dns
+  namespace: external-dns
+  chart: bitnami/external-dns
+  values:
+  - image:
+      repository: vchrisb/external-dns
+      tag: latest
+    sources:
+    - service
+    provider: "coredns"
+    coredns:
+      etcdEndpoints: "http://{{ .Values.services.externaldns.etcd.ip }}:2379"
+    #fqdnTemplates:
+    #- '{{ "{{" }}.Name{{ "}}" }}.{{ "{{" }} .Namespace {{ "}}" }}.k8s.home.dkuz.net'

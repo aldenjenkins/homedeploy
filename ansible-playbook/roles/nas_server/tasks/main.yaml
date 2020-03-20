@@ -1,0 +1,56 @@
+---
+- name: ensure hdd dir exists
+  file:
+    path: /media/storage
+    state: directory
+
+- name: install mount unit file
+  template:
+    src: media-storage.mount.j2
+    dest: /etc/systemd/system/media-storage.mount
+
+- name: enable mount
+  systemd:
+    daemon_reload: yes
+    name: media-storage.mount
+    enabled: yes
+    state: started
+
+- name: ensure file ownership on storage
+  file:
+    dest: /media/storage
+    owner: mediauser
+    group: mediauser
+    mode: "u=rwX,g=rX,o=rX"
+    recurse: yes
+
+- name: install samba
+  package:
+    name: samba
+    state: latest
+
+- name: copy smbd config
+  copy:
+    src: smb.conf
+    dest: /etc/samba/smb.conf
+
+- name: reload smbd
+  systemd:
+    name: smbd.service
+    state: reloaded
+
+- name: install nfs server
+  package:
+    name: nfs-kernel-server
+    state: latest
+
+- name: configure nfs server
+  template:
+    src: exports.j2
+    dest: /etc/exports
+  
+- name: configure nfs service
+  systemd:
+    name: nfs-kernel-server.service
+    state: reloaded
+    enabled: yes

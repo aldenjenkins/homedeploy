@@ -1,0 +1,39 @@
+---
+- name: update packages - ubuntu
+  apt:
+    update_cache: yes
+    upgrade: dist
+  when: ansible_distribution == 'Ubuntu'
+
+- name: install Ansible dependencies - ubuntu
+  apt:
+    name:
+      - libselinux1
+      - tar
+      - unzip
+      - rsync
+      - dmidecode
+      - python-docker
+    state: latest
+  when: ansible_distribution == 'Ubuntu'
+
+#######################
+
+- name: update packages - fedora
+  dnf:
+    name: "*"
+    state: latest
+  when: ansible_distribution == 'Fedora'
+
+- name: install Ansible dependencies - fedora
+  dnf:
+    name:
+      - libselinux-python
+      - tar
+      - unzip
+      - rsync
+      - python3-docker
+      - git
+      - python3-firewall
+    state: latest
+  when: ansible_distribution == 'Fedora'

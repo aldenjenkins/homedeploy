@@ -1,0 +1,18 @@
+---
+- name: install docker service - ubuntu
+  package:
+    name: docker.io
+    state: latest
+  when: ansible_distribution == 'Ubuntu'
+
+- name: install docker service - fedora
+  package:
+    name: docker
+    state: latest
+  when: ansible_distribution == 'Fedora'
+
+- name: Start and enable docker service
+  systemd:
+    name: docker.service
+    enabled: yes
+    state: started

@@ -1,0 +1,8 @@
+---
+- name: install packages for ansible support - ubuntu
+  raw: apt -y update && apt install -y python python-apt
+  ignore_errors: True
+
+- name: install packages for ansible support - fedora
+  raw: dnf -y install python python3-dnf
+  ignore_errors: True

@@ -1,0 +1,42 @@
+environments:
+  default:
+    values:
+      - values.yaml
+    secrets:
+      - secrets.yaml
+releases:
+- name: metallb
+  namespace: infra
+  chart: stable/metallb
+  values:
+  - configInline:
+      address-pools:
+      - name: default
+        protocol: layer2
+        addresses:
+        - {{ .Values.network.metallb.default_range.start }}-{{ .Values.network.metallb.default_range.end }}
+      - name: manual-assign
+        protocol: layer2
+        addresses:
+        - {{ .Values.network.metallb.reserved_range.start }}-{{ .Values.network.metallb.reserved_range.end }}
+        auto-assign: false
+- name: nginx-ingress
+  namespace: infra
+  chart: stable/nginx-ingress
+  values:
+  - defaultBackend:
+      image:
+        repository: "k8s.gcr.io/defaultbackend-arm64"
+    controller:
+      image:
+        repository: "quay.io/kubernetes-ingress-controller/nginx-ingress-controller-arm64"
+      kind: DaemonSet
+      daemonset:
+          useHostPort: true
+      service:
+        loadBalancerIP: {{ .Values.services.ingress.ip }}
+- name: whoami
+  namespace: infra
+  chart: charts/whoami
+  values:
+  - hostname: whoami.infra.{{ .Values.network.k8s_domain }}

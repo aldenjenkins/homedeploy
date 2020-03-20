@@ -1,0 +1,50 @@
+environments:
+  default:
+    values:
+      - values.yaml
+    secrets:
+      - secrets.yaml
+
+releases:
+- name: cert-manager
+  namespace: cert-manager
+  chart: jetstack/cert-manager
+  version: v0.14.0
+  values:
+  - extraArgs:
+    - "--dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53"
+    - --default-issuer-name={{ .Values.tls.issuer.name }}
+    - "--default-issuer-kind=ClusterIssuer"
+- name: digitalocean-secret
+  namespace: cert-manager
+  chart: incubator/raw
+  values:
+  - resources:
+    - apiVersion: v1
+      kind: Secret
+      metadata:
+        name: digitalocean-dns-token
+      type: Opaque
+      data:
+        access-token: {{ .Values.tls.digitalocean.accesstoken }}
+- name: digitalocean-issuer
+  namespace: cert-manager
+  chart: incubator/raw
+  values:
+  - resources:
+    - apiVersion: cert-manager.io/v1alpha2
+      kind: ClusterIssuer
+      metadata:
+        name: {{ .Values.tls.issuer.name }}
+      spec:
+        acme:
+          email: {{ .Values.tls.issuer.acme.email }}
+          server: https://acme-v02.api.letsencrypt.org/directory
+          privateKeySecretRef:
+            name: {{ .Values.tls.issuer.name }}-account-key
+          solvers:
+          - dns01:
+              digitalocean:
+                tokenSecretRef:
+                  name: digitalocean-dns-token
+                  key: access-token

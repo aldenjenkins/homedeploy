@@ -1,0 +1,12 @@
+[Unit]
+Description=External hdd mount
+After=local-fs.target
+
+[Mount]
+What={{external_hdd_dev}}
+Where=/media/storage
+Type=ext4
+Options=defaults,rw,noexec
+
+[Install]
+WantedBy=default.target

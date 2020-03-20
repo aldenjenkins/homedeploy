@@ -1,0 +1,17 @@
+---
+- name: ensure networkd config dir exists
+  file:
+    path: /etc/systemd/network
+    state: directory
+
+- name: copy eth0 network definition
+  template:
+    src: 50-eth0-dhcp.network.j2
+    dest: /etc/systemd/network/50-eth0-dhcp.network
+    mode: 0644
+
+- name: restart systemd-networkd
+  systemd:
+    name: systemd-networkd.service
+    enabled: yes
+    state: restarted

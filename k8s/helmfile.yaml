@@ -1,0 +1,15 @@
+repositories:
+- name: stable
+  url: "https://kubernetes-charts.storage.googleapis.com"
+- name: incubator
+  url: "https://kubernetes-charts-incubator.storage.googleapis.com/"
+- name: jetstack
+  url: "https://charts.jetstack.io"
+- name: bitnami
+  url: "https://charts.bitnami.com/bitnami"
+
+helmfiles:
+  - path: 01-infra.helmfile.yaml
+  - path: 02-cert-manager.helmfile.yaml
+  - path: 03-external-dns.helmfile.yaml
+  - path: 10-media.helmfile.yaml

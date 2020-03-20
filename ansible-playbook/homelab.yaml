@@ -1,0 +1,24 @@
+---
+- name: bootstrap
+  hosts: all
+  gather_facts: false
+  roles:
+  - bootstrap
+
+- name: install ansible dependecies
+  hosts: all
+  roles:
+  - install-deps
+
+- name: set up master node
+  hosts: master
+  roles:
+  - docker
+  - master-network
+  - pihole
+  - openvpn
+
+- name: set up nas server
+  hosts: nas_server
+  roles:
+  - nas_server

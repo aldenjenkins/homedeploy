@@ -1,0 +1,57 @@
+---
+- name: ensure pihole directories exist
+  file:
+    path: "/var/lib/pihole/{{item}}"
+    state: directory
+  with_items:
+    - "pihole"
+    - "dnsmasq"
+
+- name: copy dnsmasq configuration
+  copy:
+    src: "{{item}}"
+    dest: /var/lib/pihole/dnsmasq/
+    mode: 0644
+  with_items:
+    - "02-dnsmasq-listen.conf"
+
+- name: copy dnsmask templated configuration
+  template:
+    src: "{{item}}.j2"
+    dest: "/var/lib/pihole/dnsmasq/{{item}}"
+  with_items:
+    - "05-vpn-route.conf"
+    - "05-cnames.conf"
+
+- name: set up pihole container
+  docker_container:
+    name: pihole
+    image: pihole/pihole:latest
+    pull: yes
+    recreate: yes
+    state: started
+    restart_policy: unless-stopped
+    capabilities:
+      - net_admin
+      - net_raw
+      - net_bind_service
+    network_mode: host
+    hostname: "localhost"
+    env:
+      ServerIP: "{{network.master_ip}}"
+      TZ: "{{env.timezone}}"
+      WEBPASSWORD: "{{pihole_password}}"
+      DNS1: "1.1.1.1"
+      DNS2: "8.8.8.8"
+      IPv6: "False"
+      DNSMASQ_LISTENING: "any"
+      INTERFACE: "eth0"
+      VIRTUAL_HOST: "pihole.k8s.{{network.domain}}"
+      WEB_PORT: "8053"
+    volumes:
+      - "/var/lib/pihole/pihole:/etc/pihole:Z"
+      - "/var/lib/pihole/dnsmasq:/etc/dnsmasq.d:Z"
+    dns_servers:
+      - 127.0.0.1
+      - 1.1.1.1
+    etc_hosts: 'krang.{{network.domain}}={{network.master_ip}}'

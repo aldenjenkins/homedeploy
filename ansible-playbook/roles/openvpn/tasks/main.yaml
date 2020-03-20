@@ -1,0 +1,57 @@
+---
+- name: clone openvpn repo
+  git:
+    repo: "https://github.com/dimakuz/openvpn-docker"
+    dest: /var/lib/openvpn/openvpn-docker
+    version: update_alpine
+    clone: yes
+    update: yes
+
+- name: copy openvpn config
+  copy:
+    src: config
+    dest: /var/lib/openvpn/openvpn-docker/
+    mode: preserve
+
+- name: copy templated config
+  template:
+    src: server.conf.j2
+    dest: "/var/lib/openvpn/openvpn-docker/config/server.conf"
+
+- name: copy keys
+  copy:
+    content: "{{item.content}}"
+    dest: "/var/lib/openvpn/openvpn-docker/config/{{item.filename}}"
+    mode: 0600
+  with_items:
+    - content: "{{openvpn_server_key}}"
+      filename: "server.key"
+    - content: "{{openvpn_server_ta_key}}"
+      filename: "ta.key"
+    - content: "{{openvpn_server_dh_params}}"
+      filename: "dh2048.key"
+
+- name: build openvpn container
+  docker_image:
+    source: build
+    build:
+      pull: true
+      dockerfile: Dockerfile_arm64v8
+      path: /var/lib/openvpn/openvpn-docker
+    name: ficoos/openvpn
+    tag: arm64v8
+
+- name: set up openvpn container
+  docker_container:
+    name: openvpn
+    image: ficoos/openvpn:arm64v8
+    pull: no
+    state: started
+    restart_policy: unless-stopped
+    network_mode: host
+    volumes:
+      - "/var/lib/openvpn/openvpn-docker/config:/config:rw"
+    env:
+      TZ: "{{env.timezone}}"
+    privileged: yes
+    recreate: yes
