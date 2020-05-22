@@ -92,7 +92,9 @@ releases:
   namespace: media
   chart: charts/transmission
   values:
-  - hostname: torrents.media.{{ .Values.network.k8s_domain }}
+  - hostname: {{ .Values.services.transmission.hostname }}
+    service:
+      loadBalancerIP: {{ .Values.services.transmission.ip }}
     storagetype: attached
     pvc: host-storage-claim
     config:
@@ -109,8 +111,9 @@ releases:
   values:
   - image:
       repository: "linuxserver/jackett"
-    hostname: indexer.media.{{ .Values.network.k8s_domain }}
+    hostname: {{ .Values.services.jackett.hostname }}
     service:
+      loadBalancerIP: {{ .Values.services.jackett.ip }}
       port: 9117
     storagetype: nfs
     pvc: nfs-storage-claim
@@ -127,8 +130,9 @@ releases:
   values:
   - image:
       repository: "linuxserver/organizr"
-    hostname: dash.{{ .Values.network.k8s_domain }}
+    hostname: {{ .Values.services.organizr.hostname }}
     service:
+      loadBalancerIP: {{ .Values.services.organizr.ip }}
       port: 80
     storagetype: nfs
     pvc: nfs-storage-claim
@@ -145,8 +149,9 @@ releases:
   values:
   - image:
       repository: "linuxserver/radarr"
-    hostname: movies.media.{{ .Values.network.k8s_domain }}
+    hostname: {{ .Values.services.radarr.hostname }}
     service:
+      loadBalancerIP: {{ .Values.services.radarr.ip }}
       port: 7878
     storagetype: nfs
     pvc: nfs-storage-claim
@@ -163,8 +168,9 @@ releases:
   values:
   - image:
       repository: "linuxserver/sonarr"
-    hostname: tv.media.{{ .Values.network.k8s_domain }}
+    hostname: {{ .Values.services.sonarr.hostname }}
     service:
+      loadBalancerIP: {{ .Values.services.sonarr.ip }}
       port: 8989
     storagetype: nfs
     pvc: nfs-storage-claim
@@ -174,15 +180,16 @@ releases:
       timezone: {{ .Values.env.timezone }}
       uid: {{ .Values.users.mediauser.uid }}
       gid: {{ .Values.users.mediauser.gid }}
-# Sonarr
+# Bazarr
 - name: bazarr
   namespace: media
   chart: charts/genericc
   values:
   - image:
       repository: "linuxserver/bazarr"
-    hostname: subs.media.{{ .Values.network.k8s_domain }}
+    hostname: {{ .Values.services.bazarr.hostname }}
     service:
+      loadBalancerIP: {{ .Values.services.bazarr.ip }}
       port: 6767
     storagetype: nfs
     pvc: nfs-storage-claim
@@ -192,13 +199,14 @@ releases:
       timezone: {{ .Values.env.timezone }}
       uid: {{ .Values.users.mediauser.uid }}
       gid: {{ .Values.users.mediauser.gid }}
+# Plex
 - name: plex
   namespace: media
   chart: charts/plex
   values:
   - image:
       repository: "linuxserver/plex"
-    hostname: plex.media.{{ .Values.network.k8s_domain }}
+    hostname: {{ .Values.services.plex.hostname }}
     storagetype: attached
     pvc: host-storage-claim
     config:

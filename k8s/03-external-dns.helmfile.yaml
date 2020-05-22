@@ -40,6 +40,14 @@ releases:
                     )
           @                                       IN A     {{ .Values.services.ingress.ip }}
           *.{{ .Values.network.k8s_domain }}.     IN A     {{ .Values.services.ingress.ip }}
+
+          {{ .Values.services.transmission.hostname }}.     IN A     {{ .Values.services.transmission.ip }}
+          {{ .Values.services.jackett.hostname }}.          IN A     {{ .Values.services.jackett.ip }}
+          {{ .Values.services.organizr.hostname }}.         IN A     {{ .Values.services.organizr.ip }}
+          {{ .Values.services.radarr.hostname }}.           IN A     {{ .Values.services.radarr.ip }}
+          {{ .Values.services.sonarr.hostname }}.           IN A     {{ .Values.services.sonarr.ip }}
+          {{ .Values.services.bazarr.hostname }}.           IN A     {{ .Values.services.bazarr.ip }}
+          {{ .Values.services.plex.hostname }}.             IN A     {{ .Values.services.plex.ip }}
 - name: coredns-service
   namespace: external-dns
   chart: incubator/raw

@@ -26,8 +26,6 @@ metadata:
   labels:
     app: {{ .Chart.Name }}
     release: {{ .Release.Name }}
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: {{ .Values.hostname }}
 spec:
   type: {{ .Values.service.type }}
   ports:
