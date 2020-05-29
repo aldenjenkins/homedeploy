@@ -20,6 +20,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: infra
   name: {{ .Release.Name }}-lb
   labels:
     app: {{ .Chart.Name }}
@@ -28,10 +29,16 @@ spec:
   type: LoadBalancer
   loadBalancerIP: {{ .Values.service.loadBalancerIP }}
   ports:
-  - port: {{ .Values.service.port }}
-    name: http
+  - name: http
+    port: 80
     protocol: TCP
+    targetPort: http
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: https
   selector:
-    app: {{ .Chart.Name }}
-    release: {{ .Release.Name }}
+    app: nginx-ingress
+    app.kubernetes.io/component: controller
+    release: nginx-ingress
   externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}

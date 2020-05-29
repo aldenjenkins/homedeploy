@@ -1,0 +1,73 @@
+environments:
+  default:
+    values:
+      - values.yaml
+    secrets:
+      - secrets.yaml
+releases:
+- name: doddns
+  namespace: vpn
+  chart: incubator/raw
+  values:
+  - resources:
+    - apiVersion: v1
+      kind: Secret
+      metadata:
+        name: doddns-secret
+      type: Opaque
+      data:
+        access-token: {{ .Values.tls.digitalocean.accesstoken }}
+    - apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: doddns
+        labels:
+          app: doddns
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: doddns
+        template:
+          metadata:
+            labels:
+              app: doddns
+          spec:
+            containers:
+            - name: doddns-pod
+              image: "debian:buster-slim"
+              imagePullPolicy: Always
+              env:
+              - name: APIKEY
+                valueFrom:
+                  secretKeyRef:
+                    name: doddns-secret
+                    key: access-token
+              - name: DOMAIN
+                value: "{{ .Values.services.doddns.domain }}"
+              - name: RECORD
+                value: "{{ .Values.services.doddns.record }}"
+              command:
+              - sh
+              - -c
+              - |
+                apt update
+                apt install -y python3 wget python3-requests
+                wget https://raw.githubusercontent.com/ficoos/doddns/master/doddns.py -O /opt/doddns.py
+                while true
+                do
+                  python3 /opt/doddns.py $APIKEY $DOMAIN $RECORD
+                  sleep 10m
+                done
+- name: openvpn
+  namespace: vpn
+  chart: incubator/raw
+  values:
+  - resources:
+    - apiVersion: v1
+      kind: Secret
+      metadata:
+        name: openvpn-secret
+      type: Opaque
+      stringData:
+        ca_crt: '{{ .Values.services.openvpn.ca_crt }}'

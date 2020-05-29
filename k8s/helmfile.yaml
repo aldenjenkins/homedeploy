@@ -9,7 +9,10 @@ repositories:
   url: "https://charts.bitnami.com/bitnami"
 
 helmfiles:
-  - path: 01-infra.helmfile.yaml
+  # - path: 01-infra.helmfile.yaml
   - path: 02-cert-manager.helmfile.yaml
-  - path: 03-external-dns.helmfile.yaml
-  - path: 10-media.helmfile.yaml
+  # - path: 03-external-dns.helmfile.yaml
+  # - path: 10-media.helmfile.yaml
+  # - path: 11-media.helmfile.yaml
+  # - path: 05-vpn.helmfile.yaml
+

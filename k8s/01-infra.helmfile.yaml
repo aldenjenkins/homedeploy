@@ -6,7 +6,7 @@ environments:
       - secrets.yaml
 releases:
 - name: metallb
-  namespace: infra
+  namespace: metallb-system
   chart: stable/metallb
   values:
   - configInline:
@@ -20,6 +20,12 @@ releases:
         addresses:
         - {{ .Values.network.metallb.reserved_range.start }}-{{ .Values.network.metallb.reserved_range.end }}
         auto-assign: false
+    prometheus:
+      scrapeAnnotations: true
+      serviceMonitor:
+        enable: true
+    prometheusRule:
+      enable: true
 - name: nginx-ingress
   namespace: infra
   chart: stable/nginx-ingress
@@ -35,6 +41,14 @@ releases:
           useHostPort: true
       service:
         loadBalancerIP: {{ .Values.services.ingress.ip }}
+      metrics:
+        enabled: true
+        service:
+          annotations:
+            prometheus.io/scrape: true
+            prometheus.io/port: "10254"
+        serviceMonitor:
+          enabled: true
 - name: whoami
   namespace: infra
   chart: charts/whoami

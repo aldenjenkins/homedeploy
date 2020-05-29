@@ -10,12 +10,14 @@ network:
   k8s_domain: "k8s.home.dkuz.net"
   metallb:
     default_range:
-      start: "192.168.1.161"
+      start: "192.168.1.171"
       end: "192.168.1.200"
     reserved_range:
       start: "192.168.1.151"
-      end: "192.168.1.160"
+      end: "192.168.1.170"
 services:
+  smokeping:
+    hostname: "smokeping.infra.k8s.home.dkuz.net"
   externaldns:
     ip: "192.168.1.153"
     port: 5300
@@ -23,6 +25,7 @@ services:
     ip: "192.168.1.151"
   plex:
     ip: "192.168.1.154"
+    ip2: "192.168.1.161"
     hostname: "plex.media.k8s.home.dkuz.net"
   transmission:
     ip: "192.168.1.155"
@@ -42,6 +45,12 @@ services:
   bazarr:
     ip: "192.168.1.160"
     hostname: "subs.media.k8s.home.dkuz.net"
+  docker_registry:
+    hostname: "docker-registry.infra.k8s.home.dkuz.net"
+    data: "infra/docker-registry"
+  doddns:
+    domain: dkuz.net
+    record: home
 tls:
   issuer:
     name: letsencrypt-prod

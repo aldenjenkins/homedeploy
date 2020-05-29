@@ -6,12 +6,12 @@ image:
   pullPolicy: Always
 
 hostname: "GENERIC.local"
+extraIP: ""
 service:
-  type: NodePort
+  type: LoadBalancerIP
   port: 32400
   loadBalancerIP: ""
   externalTrafficPolicy: Local
-
 probe:
   initialDelay: 40
 
