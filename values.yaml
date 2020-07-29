@@ -16,8 +16,6 @@ network:
       start: "192.168.1.151"
       end: "192.168.1.170"
 services:
-  smokeping:
-    hostname: "smokeping.infra.k8s.home.dkuz.net"
   externaldns:
     ip: "192.168.1.153"
     port: 5300
@@ -45,9 +43,6 @@ services:
   bazarr:
     ip: "192.168.1.160"
     hostname: "subs.media.k8s.home.dkuz.net"
-  docker_registry:
-    hostname: "docker-registry.infra.k8s.home.dkuz.net"
-    data: "infra/docker-registry"
   doddns:
     domain: dkuz.net
     record: home
