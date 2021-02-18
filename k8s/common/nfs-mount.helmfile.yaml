@@ -1,0 +1,20 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+releases:
+- name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+  chart: charts/mount
+  values:
+  - fullnameOverride: {{ .Values.name }}
+    driver:
+      nfs:
+        server: {{ .Values.host }}
+        path: {{ .Values.path }}
+    {{- with .Values | get "accessModes" nil }}
+    accessModes:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}

@@ -1,0 +1,114 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+releases:
+- name: redis
+  namespace: nextcloud
+  createNamespace: true
+  chart: groundhog2k/redis
+  values:
+  - image:
+      tag: "6.2-rc"
+    args:
+    - /usr/local/etc/redis/redis.conf
+    storage:
+      className: {{ .Values.storage.storageClass }}
+      requestedSize: 1Gi
+    redisConfig: |
+      requirepass {{ .Values.services.nextcloud.redis.password }}
+- name: nextcloud
+  namespace: nextcloud
+  createNamespace: true
+  chart: charts/nextcloud
+  values:
+  - image:
+      tag: "20-fpm"
+    nextcloud:
+      host: {{ .Values.services.nextcloud.hostname }}
+      username: admin
+      password: {{ .Values.services.nextcloud.adminPassword }}
+      extraEnv:
+      - name: REDIS_HOST
+        value: redis
+      - name: REDIS_HOST_PORT
+        value: "6379"
+      - name: REDIS_HOST_PASSWORD
+        value: {{ .Values.services.nextcloud.redis.password }}
+      - name: TRUSTED_PROXIES
+        value: "10.42.0.0/16"
+      extraVolumes:
+      - name: photos
+        persistentVolumeClaim:
+          claimName: nextcloud-photos
+      - name: paperless
+        persistentVolumeClaim:
+          claimName: nextcloud-paperless
+      extraVolumeMounts:
+      - name: photos
+        mountPath: /external/photos
+      - name: paperless
+        mountPath: /external/paperless
+      # FIXME add mail details
+      securityContext:
+        runAsUser: {{ .Values.users.mediauser.uid }}
+        runAsGroup: {{ .Values.users.mediauser.gid }}
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        kubernetes.io/tls-acme: "true"
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        nginx.ingress.kubernetes.io/client-body-buffer-size: 10M
+      tls:
+      - secretName: "{{ .Values.services.nextcloud.hostname }}-tls"
+        hosts:
+          - {{ .Values.services.nextcloud.hostname }}
+    internalDatabase:
+      enabled: false
+    externalDatabase:
+      enabled: true
+      type: mysql
+      host: mariadb
+      database: {{ .Values.services.nextcloud.mariadb.userDatabase }} 
+      user: {{ .Values.services.nextcloud.mariadb.userName }}
+      password: {{ .Values.services.nextcloud.mariadb.userPassword }} 
+    cronjob:
+      enabled: true
+      failedJobsHistoryLimit: 1
+      successfulJobsHistoryLimit: 1
+    persistence:
+      enabled: true
+      existingClaim: nextcloud-data
+    nginx:
+      enabled: true
+helmfiles:
+- path: ../common/hostdir-mount.helmfile.yaml
+  values:
+  - namespace: nextcloud
+    name: nextcloud-data
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.nextcloud }}"
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: nextcloud
+    name: nextcloud-photos
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.photos }}"
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: nextcloud
+    name: nextcloud-paperless
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.paperless }}"
+- path: ../common/mariadb.helmfile.yaml
+  values:
+  - name: mariadb
+    namespace: nextcloud
+    storageClass: {{ .Values.storage.storageClass }}
+    rootPassword: {{ .Values.services.nextcloud.mariadb.rootPassword }} 
+    userDatabase: {{ .Values.services.nextcloud.mariadb.userDatabase }} 
+    userName: {{ .Values.services.nextcloud.mariadb.userName }} 
+    userPassword: {{ .Values.services.nextcloud.mariadb.userPassword }}

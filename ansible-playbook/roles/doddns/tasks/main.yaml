@@ -1,0 +1,33 @@
+---
+- name: clone doddns sources
+  git:
+    repo: "https://github.com/dimakuz/doddns"
+    dest: /opt/doddns
+    clone: yes
+    update: yes
+    version: add_envfile
+
+- name: copy private envfile config
+  template:
+    src: doddns.j2
+    dest: /etc/sysconfig/doddns
+    mode: 0600
+
+- name: install service unit file
+  copy:
+    remote_src: yes
+    src: /opt/doddns/doddns.service
+    dest: /etc/systemd/system/doddns.service
+
+- name: install timer unit file
+  copy:
+    remote_src: yes
+    src: /opt/doddns/doddns.timer
+    dest: /etc/systemd/system/doddns.timer
+
+- name: enable doddns timer
+  systemd:
+    daemon_reload: yes
+    name: doddns.timer
+    state: started
+    enabled: yes

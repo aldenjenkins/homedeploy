@@ -1,0 +1,36 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+releases:
+- name: docker-registry
+  namespace: docker-registry
+  createNamespace: true
+  chart: twuni/docker-registry
+  values:
+  - persistence:
+      enabled: true
+      deleteEnabled: true
+      existingClaim: docker-registry-data
+    ingress:
+      enabled: true
+      tls:
+      - hosts:
+        - {{ .Values.services.docker_registry.hostname }}
+        secretName: registry-tls
+      hosts:
+      - {{ .Values.services.docker_registry.hostname }}
+      path: "/v2"
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        kubernetes.io/ingress.class: nginx
+        kubernetes.io/tls-acme: "true"
+helmfiles:
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: docker-registry
+    name: docker-registry-data
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.dockerRegistry }}"

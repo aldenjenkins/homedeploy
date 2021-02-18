@@ -1,0 +1,20 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+releases:
+- name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+  chart: groundhog2k/mariadb
+  values:
+  - storage:
+      requestedSize: 10Gi
+      className: {{ .Values.storage.storageClass }}
+    settings:
+      rootPassword: {{ .Values.rootPassword }} 
+    userDatabase:
+      name: {{ .Values.userDatabase }} 
+      user: {{ .Values.userName }} 
+      password: {{ .Values.userPassword }}

@@ -1,0 +1,13 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+releases:
+- name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+  chart: charts/build-container
+  values:
+  - dockerfile: {{ .Values.dockerfile }}
+    

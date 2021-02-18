@@ -23,29 +23,40 @@ services:
     ip: "192.168.1.151"
   plex:
     ip: "192.168.1.154"
-    ip2: "192.168.1.161"
     hostname: "plex.media.k8s.home.dkuz.net"
   transmission:
-    ip: "192.168.1.155"
     hostname: "torrents.media.k8s.home.dkuz.net"
   jackett:
-    ip: "192.168.1.156"
     hostname: "indexer.media.k8s.home.dkuz.net"
   organizr:
-    ip: "192.168.1.157"
     hostname: "dash.media.k8s.home.dkuz.net"
   radarr:
-    ip: "192.168.1.158"
     hostname: "movies.media.k8s.home.dkuz.net"
   sonarr:
-    ip: "192.168.1.159"
     hostname: "tv.media.k8s.home.dkuz.net"
   bazarr:
-    ip: "192.168.1.160"
     hostname: "subs.media.k8s.home.dkuz.net"
+  jellyfin:
+    hostname: "jellyfin.media.k8s.home.dkuz.net"
+  nextcloud:
+    hostname: "nextcloud.k8s.home.dkuz.net"
+  gallery:
+    hostname: "photos.k8s.home.dkuz.net"
+  paperless:
+    hostname: "paperless.k8s.home.dkuz.net"
   doddns:
     domain: dkuz.net
     record: home
+  wireguard:
+    ip: "192.168.1.162"
+    hostname: "vpn.k8s.home.dkuz.net"
+    vpn:
+      gw: "192.168.4.1"
+      cidr: "192.168.4.0/24"
+  docker_registry:
+    hostname: "registry.infra.k8s.home.dkuz.net"
+  recipes:
+    hostname: "recipes.k8s.home.dkuz.net"
 tls:
   issuer:
     name: letsencrypt-prod
@@ -53,7 +64,28 @@ storage:
   nodename: rocksteady
   server: rocksteady
   capacity: 4Ti
-  mountpoint: /media/storage
+  storageClass: nfs-client
+paths:
+  root: /media/storage
+
+  # K8s
+  volumes: /media/storage/volumes
+
+  # WWW
+  gallery: /media/storage/www/gallery
+
+  # Media
+  media: /media/storage/media
+  mediaConfig: /media/storage/media/config
+
+  # Files
+  photos: /media/storage/files/photos
+  paperless: /media/storage/files/paperless
+  nextcloud: /media/storage/files/nextcloud
+
+  # Infra
+  dockerRegistry: /media/storage/infra/docker-registry
+  backupCache: /media/storage/infra/backup-cache
 env:
   timezone: "Asia/Jerusalem"
 users:

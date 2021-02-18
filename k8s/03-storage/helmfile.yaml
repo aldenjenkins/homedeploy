@@ -1,0 +1,20 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+releases:
+- name: nfs-client-provisioner
+  chart: ckotzbauer/nfs-client-provisioner
+  namespace: nfs-client-provisioner
+  createNamespace: true
+  values:
+  - image:
+      repository: quay.io/external_storage/nfs-client-provisioner-arm
+    storageClass:
+      name: {{ .Values.storage.storageClass }}
+    nfs:
+      server: {{ .Values.storage.server }}
+      path: {{ .Values.paths.volumes }}
+      mountOpts: "nfsvers=3"

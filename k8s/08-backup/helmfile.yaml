@@ -1,0 +1,53 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+releases:
+- name: restic
+  namespace: backup
+  createNamespace: true
+  chart: charts/restic-backup
+  values:
+  - schedule: "0 0 * * *"
+    resticPassword: {{ .Values.backup.restic.password }}
+    telegram:
+      client: "{{ .Values.backup.telegram.client }}"
+      token: {{ .Values.backup.telegram.token }}
+    backups:
+    - name: primary
+      bucket: gcs:{{.Values.backup.gcs.bucket}}/primary
+      path: /storage/backup
+    rcloneConf: |
+      [gcs]
+      type = google cloud storage
+      project_number = {{ .Values.backup.gcs.project_number }}
+      service_account_file = /secret/gcssa.json
+      location = eu
+      storage_class = COLDLINE
+    cache:
+      claimName: restic-cache
+    extraSecrets:
+      gcssa.json : "{{ .Values.backup.gcs.sa }}"
+    extraVolumes:
+    - name: nas
+      persistentVolumeClaim:
+        claimName: restic-nas
+    extraVolumeMounts:
+    - name: nas
+      mountPath: /storage
+
+helmfiles:
+- path: ../common/hostdir-mount.helmfile.yaml
+  values:
+  - namespace: backup
+    name: restic-cache
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.backupCache }}"
+- path: ../common/hostdir-mount.helmfile.yaml
+  values:
+  - namespace: backup
+    name: restic-nas
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.root }}"

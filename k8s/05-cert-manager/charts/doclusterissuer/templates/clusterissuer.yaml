@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: {{ .Values.acme.name }}
+  labels:
+    {{- include "doclusterissuer.labels" . | nindent 4 }}
+spec:
+  acme:
+    email: {{ .Values.acme.email }}
+    server: {{ .Values.acme.server }}
+    privateKeySecretRef:
+      name: {{ .Values.acme.name }}-account-key
+    solvers:
+    - dns01:
+        digitalocean:
+          tokenSecretRef:
+            name: {{ include "doclusterissuer.fullname" . }}
+            key: access-token

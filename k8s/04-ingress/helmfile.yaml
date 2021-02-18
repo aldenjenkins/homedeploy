@@ -1,0 +1,18 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+releases:
+- name: nginx-ingress
+  namespace: infra
+  chart: ingress-nginx/ingress-nginx
+  values:
+  - controller:
+      kind: Deployment
+      hostPort:
+        enabled: true
+      hostNetwork: true
+      service:
+        loadBalancerIP: {{ .Values.services.ingress.ip }}

@@ -1,0 +1,121 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+releases:
+- name: static-site
+  namespace: gallery
+  createNamespace: true
+  chart: charts/static-site
+  values:
+  - siteConf: |
+      server {
+        listen 80;
+        index index.html index.htm;
+        location / {
+          root /gallery/;
+        }
+      }
+    extraVolumes:
+    - name: photos
+      persistentVolumeClaim:
+        claimName: site-photos
+    - name: gallery
+      persistentVolumeClaim:
+        claimName: site-gallery
+    extraVolumeMounts:
+    - name: gallery
+      mountPath: /gallery
+    - name: photos
+      mountPath: /photos
+    ingress:
+      enabled: true
+      annotations: 
+        kubernetes.io/ingress.class: nginx
+        kubernetes.io/tls-acme: "true"
+      hosts:
+      - host: {{ .Values.services.gallery.hostname }}
+        paths:
+        - path: /
+      tls:
+      - secretName: {{ .Values.services.gallery.hostname }}-tls
+        hosts:
+        - {{ .Values.services.gallery.hostname }}
+- name: thumbsup
+  namespace: gallery
+  createNamespace: true
+  chart: charts/thumbsup-cron
+  values:
+  - image:
+      repository: registry.infra.k8s.home.dkuz.net/thumbsup
+      tag: "v2.15.0"
+    schedule: "0 0 * * *"
+    command:
+    - "sh"
+    - "-c"
+    - |
+      thumbsup \
+        --input /photos/ \
+        --output /gallery/ \
+        --theme cards \
+        --photo-download symlink \
+        --video-download symlink \
+        --album-previews spread \
+        --concurrency 1 \
+        --cleanup \
+        --albums-from "By Date/{YYYY}/{MM}" \
+        --albums-from "By Path/%path"
+      chown {{ .Values.users.mediauser.uid }}.{{ .Values.users.mediauser.gid }} /gallery -R
+      chmod u=rwX,g=rwX,o=rX /gallery -R
+    extraVolumeMounts:
+    - name: gallery
+      mountPath: /gallery
+    - name: photos
+      mountPath: /photos
+    extraVolumes:
+    - name: photos
+      persistentVolumeClaim:
+        claimName: cron-photos
+    - name: gallery
+      persistentVolumeClaim:
+        claimName: cron-gallery
+    resources:
+      limits:
+        cpu: 1
+        memory: 1Gi
+helmfiles:
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: gallery
+    name: site-photos
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.photos }}"
+    accessModes:
+    - ReadOnlyMany
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: gallery
+    name: site-gallery
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.gallery }}"
+    accessModes:
+    - ReadOnlyMany
+# FIXME maybe unify
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: gallery
+    name: cron-photos
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.photos }}"
+    accessModes:
+    - ReadOnlyMany
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: gallery
+    name: cron-gallery
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.gallery }}"
+    accessModes:
+    - ReadWriteOnce

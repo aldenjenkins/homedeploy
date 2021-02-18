@@ -1,0 +1,63 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "build-container.fullname" . }}
+  labels:
+    {{- include "build-container.labels" . | nindent 4 }}
+  annotations:
+    checksum/script: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+spec:
+  schedule: "{{ .Values.schedule }}"
+  concurrencyPolicy: Replace
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "build-container.selectorLabels" . | nindent 8 }}
+    spec:
+      parallelism: 1
+      template:
+        metadata:
+          labels:
+            {{- include "build-container.selectorLabels" . | nindent 12 }}
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: {{ .Release.Name }}
+              image: {{ .Values.imagebuilder.image.repository }}:{{ .Values.imagebuilder.image.tag }}
+              imagePullPolicy: {{ .Values.imagebuilder.image.pullPolicy }}
+              args:
+              - "--dockerfile=/context/Dockerfile"
+              - "--context=dir:/context"
+              - "--destination={{ .Values.destination }}"
+              volumeMounts:
+              - name: context
+                mountPath: /context
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          volumes:
+          - name: context
+            configMap:
+              name: "{{ include "build-container.fullname" . }}-build-ctx"
+
+

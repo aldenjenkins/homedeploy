@@ -1,19 +1,34 @@
 repositories:
-- name: stable
-  url: "https://kubernetes-charts.storage.googleapis.com"
-- name: incubator
-  url: "https://kubernetes-charts-incubator.storage.googleapis.com/"
 - name: jetstack
   url: "https://charts.jetstack.io"
 - name: bitnami
   url: "https://charts.bitnami.com/bitnami"
-
+- name: ingress-nginx
+  url: "https://kubernetes.github.io/ingress-nginx"
+- name: ckotzbauer
+  url: "https://ckotzbauer.github.io/helm-charts"
+- name: coredns
+  url: "https://coredns.github.io/helm"
+- name: k8s-at-home
+  url: "https://k8s-at-home.com/charts/"
+- name: nextcloud
+  url: "https://nextcloud.github.io/helm/"
+- name: groundhog2k
+  url: "https://groundhog2k.github.io/helm-charts/"
+- name: twuni 
+  url: "https://helm.twun.io"
 helmfiles:
-  # - path: 01-infra.helmfile.yaml
-  # - path: 02-cert-manager.helmfile.yaml
-  # - path: 03-external-dns.helmfile.yaml
-  # - path: 10-media.helmfile.yaml
-  # - path: 11-media.helmfile.yaml
-  # - path: 05-vpn.helmfile.yaml
-  - path: 12-backup.helmfile.yaml
-
+  - path: 01-metallb/helmfile.yaml
+  - path: 02-external-dns/helmfile.yaml
+  - path: 03-storage/helmfile.yaml
+  - path: 04-ingress/helmfile.yaml
+  - path: 05-cert-manager/helmfile.yaml
+  - path: 06-vpn/helmfile.yaml
+  - path: 07-docker-registry/helmfile.yaml
+  - path: 08-backup/helmfile.yaml
+  - path: 10-media/helmfile.yaml
+  - path: 11-nextcloud/helmfile.yaml
+  - path: 12-gallery/helmfile.yaml
+  - path: 13-paperless/helmfile.yaml
+  - path: 14-recipes/helmfile.yaml
+  

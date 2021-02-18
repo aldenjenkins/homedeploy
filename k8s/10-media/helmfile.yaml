@@ -1,0 +1,11 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+
+helmfiles:
+- path: 02-torrents.yaml
+- path: 03-library-mgmt.yaml
+- path: 04-consuming.yaml

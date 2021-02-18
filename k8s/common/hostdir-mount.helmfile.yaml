@@ -1,0 +1,28 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+releases:
+- name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+  chart: charts/mount
+  values:
+  - fullnameOverride: {{ .Values.name }}
+    driver:
+      hostPath:
+        path: {{ .Values.path }}
+        type: Directory
+      nodeAffinity:
+        required:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+              - {{ .Values.host }}
+    {{- with .Values | get "accessModes" nil }}
+    accessModes:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}

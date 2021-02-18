@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "mount.fullname" . }}
+  labels:
+    {{- include "mount.labels" . | nindent 4 }}
+spec:
+  storageClassName: ""
+  accessModes:
+  {{ toYaml .Values.accessModes | nindent 2}}
+  resources:
+    requests:
+      storage: {{ .Values.capacity }}
+  selector:
+    matchLabels:
+      {{- include "mount.labels" . | nindent 6 }}

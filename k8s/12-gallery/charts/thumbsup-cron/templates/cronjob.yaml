@@ -1,0 +1,67 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "thumbsup-cron.fullname" . }}
+  labels:
+    {{- include "thumbsup-cron.labels" . | nindent 4 }}
+spec:
+  schedule: "{{ .Values.schedule }}"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "thumbsup-cron.selectorLabels" . | nindent 8 }}
+    spec:
+      activeDeadlineSeconds: 345600
+      parallelism: 1
+      template:
+        metadata:
+          labels:
+            {{- include "thumbsup-cron.selectorLabels" . | nindent 12 }}
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: thumbsup
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              command:
+              {{ toYaml .Values.command | nindent 16 }}
+              {{- with .Values.extraVolumeMounts }}
+              volumeMounts:
+              {{- toYaml . | nindent 16 }}
+              {{- end }}
+
+          {{- with .Values.extraVolumes }}
+          volumes:
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+  
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+

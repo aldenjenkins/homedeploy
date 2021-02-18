@@ -1,0 +1,57 @@
+environments:
+  default:
+    values:
+      - ../../values.yaml
+    secrets:
+      - ../../secrets.yaml
+releases:
+  - name: {{ .Values.name }}
+    namespace: media
+    createNamespace: true
+    chart: k8s-at-home/{{ .Values.name }}
+    values:
+    - image:
+        tag: {{ .Values.tag | default "latest" }}
+      env:
+        TZ: {{ .Values.env.timezone }}
+        PUID: {{ .Values.users.mediauser.uid }}
+        PGID: {{ .Values.users.mediauser.gid }}
+      ingress:
+        enabled: true
+        annotations: 
+          kubernetes.io/ingress.class: nginx
+          kubernetes.io/tls-acme: "true"
+        hosts:
+          - host: {{ .Values.hostname }}
+            paths:
+              - path: /
+        tls:
+        - secretName: {{ .Values.hostname }}-tls
+          hosts:
+            - {{ .Values.hostname }}
+      persistence:
+        config:
+          enabled: true
+          existingClaim: {{ .Values.name }}-config
+        media:
+          enabled: {{ .Values.enableMedia }}
+          existingClaim: {{ .Values.name }}-media
+      probes:
+        liveness:
+          spec:
+            initialDelaySeconds: 120
+helmfiles:
+- path: ../../common/{{ .Values.volType }}-mount.helmfile.yaml
+  values:
+  - namespace: media
+    name: {{ .Values.name }}-config
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.mediaConfig}}/{{ .Values.name }}"
+{{- if .Values.enableMedia }}
+- path: ../../common/{{ .Values.volType }}-mount.helmfile.yaml
+  values:
+  - namespace: media
+    name: {{ .Values.name }}-media
+    host: {{ .Values.storage.server }}
+    path: {{ .Values.paths.media }}
+{{- end }}

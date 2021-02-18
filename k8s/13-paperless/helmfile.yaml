@@ -1,0 +1,77 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+releases:
+- name: paperless
+  namespace: paperless
+  createNamespace: true
+  chart: k8s-at-home/paperless
+  values:
+  - image:
+      repository: registry.infra.k8s.home.dkuz.net/paperless-ng
+      tag: sidecar
+    env:
+      PAPERLESS_TIME_ZONE: {{ .Values.env.timezone }}
+      PAPERLESS_CONSUMER_POLLING: "10"
+      PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{asn}_{title}"
+      PAPERLESS_CONVERT_MEMORY_LIMIT: "128"
+      PAPERLESS_TASK_WORKERS: "2"
+      PAPERLESS_THREADS_PER_WORKER: "2"
+      PAPERLESS_OCR_LANGUAGE: "heb+osd+eng"
+      PAPERLESS_OCR_LANGUAGES: "heb eng"
+      PAPERLESS_AUTO_LOGIN_USERNAME: "paperless"
+      PAPERLESS_OCR_USER_ARGS: "{\"optimize\": 3}"
+      # PAPERLESS_DEBUG: "true"
+      USERMAP_UID: {{ .Values.users.mediauser.uid }}
+      USERMAP_GID: {{ .Values.users.mediauser.gid }}
+    persistence:
+      media:
+        enabled: true
+        existingClaim: paperless-media
+      data:
+        enabled: true
+        accessMode: ReadWriteOnce
+        storageClass: {{ .Values.storage.storageClass }}
+        size: 1Gi
+      consume:
+        enabled: true
+        existingClaim: paperless-consume
+    probes:
+      liveness:
+        enabled: false
+      readiness:
+        enabled: false
+    additionalContainers:
+    - name: broker
+      image: "redis:6.2-rc"
+      imagePullPolicy: IfNotPresent
+    ingress:
+      enabled: true
+      annotations: 
+        kubernetes.io/ingress.class: nginx
+        kubernetes.io/tls-acme: "true"
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      hosts:
+        - host: {{ .Values.services.paperless.hostname }}
+          paths:
+          - path: /
+      tls:
+      - secretName: {{ .Values.services.paperless.hostname }}-tls
+        hosts:
+        - {{ .Values.services.paperless.hostname }}
+helmfiles:
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: paperless
+    name: paperless-media
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.paperless }}/documents"
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: paperless
+    name: paperless-consume
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.paperless }}/consume"

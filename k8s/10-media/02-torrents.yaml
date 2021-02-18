@@ -1,0 +1,46 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+releases:
+  - name: transmission
+    namespace: media
+    createNamespace: true
+    chart: charts/transmission
+    values:
+    - configPVC: transmission-config
+      mediaPVC: transmission-media
+      env:
+        uid: {{ .Values.users.mediauser.uid }}
+        gid: {{ .Values.users.mediauser.gid }}
+        timezone: {{ .Values.env.timezone }}
+      ingress:
+        enabled: true
+        annotations: 
+          kubernetes.io/ingress.class: nginx
+          kubernetes.io/tls-acme: "true"
+        hosts:
+        - host: {{ .Values.services.transmission.hostname }}
+          paths:
+          - path: /
+        tls:
+        - secretName: {{ .Values.services.transmission.hostname }}-tls
+          hosts:
+          - {{ .Values.services.transmission.hostname }}
+helmfiles:
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: media
+    name: transmission-config
+    enable: true
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.mediaConfig }}/transmission"
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: media
+    name: transmission-media
+    enable: true
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.media }}"

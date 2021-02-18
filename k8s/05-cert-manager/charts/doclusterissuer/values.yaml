@@ -1,0 +1,12 @@
+# Default values for doclusterissuer.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+nameOverride: ""
+fullnameOverride: ""
+
+digitalocean:
+  accesstoken:
+acme:
+  name: ""
+  email: ""
+  server: ""

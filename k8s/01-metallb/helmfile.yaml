@@ -1,0 +1,32 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+releases:
+- name: metallb
+  namespace: metallb
+  createNamespace: true
+  chart: bitnami/metallb
+  values:
+  - controller:
+      image:
+        repository: metallb/controller
+        tag: v0.9
+    speaker:
+      secretValue: {{ .Values.services.metallb.speakerSecret }}
+      image:
+        repository: metallb/speaker
+        tag: v0.9
+    configInline:
+      address-pools:
+      - name: default
+        protocol: layer2
+        addresses:
+        - {{ .Values.network.metallb.default_range.start }}-{{ .Values.network.metallb.default_range.end }}
+      - name: manual-assign
+        protocol: layer2
+        addresses:
+        - {{ .Values.network.metallb.reserved_range.start }}-{{ .Values.network.metallb.reserved_range.end }}
+        auto-assign: false

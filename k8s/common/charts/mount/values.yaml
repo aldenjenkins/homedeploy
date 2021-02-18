@@ -1,0 +1,11 @@
+# Default values for nfs-mount.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+reclaimPolicy: Retain
+capacity: 1Ti
+accessModes:
+- ReadWriteOnce
+driver: {}

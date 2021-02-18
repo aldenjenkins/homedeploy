@@ -1,0 +1,45 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+
+releases:
+- name: external-dns
+  namespace: external-dns
+  createNamespace: true
+  chart: coredns/coredns
+  values:
+  - serviceType: LoadBalancer
+    service:
+      loadBalancerIP: {{ .Values.services.externaldns.ip }}
+    servers:
+    - port: {{ .Values.services.externaldns.port }}
+      zones:
+      - zone: .
+        scheme: dns://
+      plugins:
+      - name: errors
+      - name: health
+        configBlock: lameduck 5s
+      - name: ready
+      - name: file
+        parameters: /etc/coredns/home_k8s {{ .Values.network.k8s_domain }}
+      - name: reload
+      - name: loadbalance
+    zoneFiles:
+    - filename: home_k8s
+      domain: {{ .Values.network.k8s_domain }}
+      contents: |
+        $TTL 60
+        $ORIGIN {{ .Values.network.k8s_domain }}.
+        @         IN	SOA sns.dns.icann.org. noc.dns.icann.org. (
+                  2017042745 ; serial
+                  7200       ; refresh (2 hours)
+                  3600       ; retry (1 hour)			
+                  1209600    ; expire (2 weeks)				
+                  3600       ; minimum (1 hour)				
+                  )
+        @                                       IN A     {{ .Values.services.ingress.ip }}
+        *.{{ .Values.network.k8s_domain }}.     IN A     {{ .Values.services.ingress.ip }}

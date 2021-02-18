@@ -1,0 +1,31 @@
+environments:
+  default:
+    values:
+      - ../values.yaml
+    secrets:
+      - ../secrets.yaml
+
+releases:
+- name: cert-manager
+  namespace: cert-manager
+  createNamespace: true
+  chart: jetstack/cert-manager
+  values:
+  - extraArgs:
+    - --dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53
+    - --default-issuer-name={{ .Values.tls.issuer.name }}
+    - --default-issuer-kind=ClusterIssuer
+    installCRDs: true
+- name: cluster-issuer
+  namespace: cert-manager
+  createNamespace: true
+  chart: charts/doclusterissuer
+  needs:
+  - cert-manager/cert-manager
+  values:
+  - digitalocean:
+      accesstoken: {{ .Values.tls.digitalocean.accesstoken }}
+    acme:
+      name: {{ .Values.tls.issuer.name }}
+      email: {{ .Values.tls.issuer.acme.email }}
+      server: https://acme-v02.api.letsencrypt.org/directory

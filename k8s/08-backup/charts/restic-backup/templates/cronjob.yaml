@@ -1,0 +1,128 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "restic-backup.fullname" . }}
+  labels:
+    {{- include "restic-backup.labels" . | nindent 4 }}
+  annotations:
+    checksum/script: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+spec:
+  schedule: "{{ .Values.schedule }}"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "restic-backup.selectorLabels" . | nindent 8 }}
+    spec:
+      activeDeadlineSeconds: 345600
+      parallelism: 1
+      template:
+        metadata:
+          labels:
+            {{- include "restic-backup.selectorLabels" . | nindent 12 }}
+          annotations:
+            checksum/script: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+            checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        spec:
+          restartPolicy: Never
+          initContainers:
+          {{- range .Values.backups }}
+            - name: "backup-{{ .name }}"
+              securityContext:
+                {{- toYaml $.Values.securityContext | nindent 16 }}
+              image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
+              resources:
+                {{- toYaml $.Values.resources | nindent 16 }}
+              env:
+              - name: RESTIC_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ include "restic-backup.fullname" $ }}
+                    key: RESTIC_PASSWORD
+              - name: TELEGRAM_TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ include "restic-backup.fullname" $ }}
+                    key: TELEGRAM_TOKEN
+              - name: TELEGRAM_CLIENT
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ include "restic-backup.fullname" $ }}
+                    key: TELEGRAM_CLIENT
+              command:
+              - "bash"
+              - "-c"
+              - |
+                /opt/setup.sh
+                /opt/run.sh {{ .name }} {{ .bucket }} {{ .path }}
+              volumeMounts:
+              - name: cache
+                mountPath: /cache
+              - name: secret
+                mountPath: /secret/
+              - name: config
+                subPath: setup.sh
+                mountPath: /opt/setup.sh
+              - name: config
+                subPath: run.sh
+                mountPath: /opt/run.sh
+              - name: config
+                mountPath:  /root/.config/rclone/rclone.conf
+                subPath: rclone.conf
+              {{- with $.Values.extraVolumeMounts }}
+              {{- toYaml . | nindent 14 }}
+              {{- end }}
+          {{- end}}
+          containers:
+            - name: "noop"
+              securityContext:
+                {{- toYaml $.Values.securityContext | nindent 16 }}
+              image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
+              resources:
+                {{- toYaml $.Values.resources | nindent 16 }}
+              command:
+              - "echo"
+              - "noop"
+          volumes:
+          - name: cache
+            persistentVolumeClaim:
+              claimName: {{ .Values.cache.claimName }}
+          - name: config
+            configMap:
+              name: {{ include "restic-backup.fullname" . }}
+              defaultMode: 0755
+          - name: secret
+            secret:
+              secretName: {{ include "restic-backup.fullname" . }}
+          {{- with .Values.extraVolumes }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+  
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+

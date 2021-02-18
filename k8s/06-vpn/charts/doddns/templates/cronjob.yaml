@@ -1,0 +1,81 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "doddns.fullname" . }}
+  labels:
+    {{- include "doddns.labels" . | nindent 4 }}
+  annotations:
+    checksum/script: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+spec:
+  schedule: "*/10 * * * *"
+  concurrencyPolicy: Replace
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    metadata:
+      labels:
+        {{- include "doddns.selectorLabels" . | nindent 8 }}
+    spec:
+      activeDeadlineSeconds: 120
+      parallelism: 1
+      template:
+        metadata:
+          labels:
+            {{- include "doddns.selectorLabels" . | nindent 12 }}
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: {{ .Chart.Name }}
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              image: "{{ .Values.image.repository }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              env:
+              - name: APIKEY
+                valueFrom:
+                  secretKeyRef:
+                    name: {{ include "doddns.fullname" . }}
+                    key: access-token
+              - name: DOMAIN
+                value: "{{ .Values.domain }}"
+              - name: RECORD
+                value: "{{ .Values.record }}"
+              volumeMounts:
+              - name: files
+                mountPath: /opt
+              command:
+              - sh
+              - -c
+              - pip install requests && python3 /opt/doddns.py $APIKEY $DOMAIN $RECORD
+
+          volumes:
+          - name: files
+            configMap:
+              name: "{{ include "doddns.fullname" . }}-files"
+
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+  
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+

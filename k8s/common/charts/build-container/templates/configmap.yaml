@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "build-container.fullname" . }}
+  labels:
+    {{- include "build-container.labels" . | nindent 4 }}
+data:
+{{- range $name, $content := .Values.files }}
+{{ $name || nindent 2}}: {{ $content }}
+{{- end}}
