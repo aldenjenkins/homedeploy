@@ -22,76 +22,89 @@ services:
   ingress:
     ip: "192.168.1.151"
   plex:
+    enabled: true
     ip: "192.168.1.154"
     hostname: "plex.media.k8s.home.dkuz.net"
   transmission:
+    enabled: true
     hostname: "torrents.media.k8s.home.dkuz.net"
   jackett:
+    enabled: true
     hostname: "indexer.media.k8s.home.dkuz.net"
-  organizr:
-    hostname: "dash.media.k8s.home.dkuz.net"
   radarr:
+    enabled: true
     hostname: "movies.media.k8s.home.dkuz.net"
   sonarr:
+    enabled: true
     hostname: "tv.media.k8s.home.dkuz.net"
   bazarr:
+    enabled: true
     hostname: "subs.media.k8s.home.dkuz.net"
   jellyfin:
+    enabled: false
     hostname: "jellyfin.media.k8s.home.dkuz.net"
   nextcloud:
+    enabled: false
     hostname: "nextcloud.k8s.home.dkuz.net"
   gallery:
+    enabled: true
     hostname: "photos.k8s.home.dkuz.net"
   paperless:
+    enabled: false
     hostname: "paperless.k8s.home.dkuz.net"
   doddns:
+    enabled: true
     domain: dkuz.net
     record: home
   wireguard:
+    enabled: true
     ip: "192.168.1.162"
     hostname: "vpn.k8s.home.dkuz.net"
     vpn:
       gw: "192.168.4.1"
       cidr: "192.168.4.0/24"
   docker_registry:
+    enabled: false
     hostname: "registry.infra.k8s.home.dkuz.net"
-  recipes:
-    hostname: "recipes.k8s.home.dkuz.net"
+  bookstack:
+    enabled: true
+    hostname: "wiki.k8s.home.dkuz.net"
 tls:
   issuer:
     name: letsencrypt-prod
 storage:
-  nodename: rocksteady
-  server: rocksteady
+  nodename: nas
+  server: nas.home.dkuz.net
   capacity: 4Ti
   storageClass: nfs-client
 paths:
-  root: /media/storage
+  root: /export/main
 
   # K8s
-  volumes: /media/storage/volumes
+  volumes: /export/main/volumes
 
   # WWW
-  gallery: /media/storage/www/gallery
+  gallery: /export/main/www/gallery
 
   # Media
-  media: /media/storage/media
-  mediaConfig: /media/storage/media/config
+  media: /export/main/media
+  mediaConfig: /export/main/media/config
 
   # Files
-  photos: /media/storage/files/photos
-  paperless: /media/storage/files/paperless
-  nextcloud: /media/storage/files/nextcloud
+  photos: /export/main/files/photos
+  paperless: /export/main/files/paperless
+  nextcloud: /export/main/files/nextcloud
+  nextcloudRedis: /export/main/files/nextcloud-redis
+  nextcloudMariadb: /export/main/files/nextcloud-mariadb
+  bookstackMariadb: /export/main/files/bookstack-mariadb
+  bookstackConfig: /export/main/files/bookstack-config
 
   # Infra
-  dockerRegistry: /media/storage/infra/docker-registry
-  backupCache: /media/storage/infra/backup-cache
+  dockerRegistry: /export/main/infra/docker-registry
+  backupCache: /export/main/infra/backup-cache
 env:
   timezone: "Asia/Jerusalem"
 users:
   mediauser:
     uid: 2000
     gid: 2000
-  janitor:
-    uid: 1500
-    gid: 1500

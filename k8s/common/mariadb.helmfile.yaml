@@ -9,9 +9,15 @@ releases:
   namespace: {{ .Values.namespace }}
   chart: groundhog2k/mariadb
   values:
-  - storage:
+  - fullnameOverride: {{ .Values.name }}
+    storage:
       requestedSize: 10Gi
-      className: {{ .Values.storage.storageClass }}
+{{- with .Values | get "storageClass" nil }}
+      className: {{ . }}
+{{- end }}
+{{- with .Values | get "pvc" nil }}
+      persistentVolumeClaimName: {{ . }}
+{{- end }}
     settings:
       rootPassword: {{ .Values.rootPassword }} 
     userDatabase:

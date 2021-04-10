@@ -16,6 +16,11 @@ releases:
     - --default-issuer-name={{ .Values.tls.issuer.name }}
     - --default-issuer-kind=ClusterIssuer
     installCRDs: true
+    cainjector:
+      enabled: true
+      replicaCount: 1
+      extraArgs:
+      - --leader-elect=false
 - name: cluster-issuer
   namespace: cert-manager
   createNamespace: true

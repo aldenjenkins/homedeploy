@@ -28,7 +28,7 @@ spec:
             checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         spec:
           restartPolicy: Never
-          initContainers:
+          containers:
           {{- range .Values.backups }}
             - name: "backup-{{ .name }}"
               securityContext:
@@ -77,17 +77,6 @@ spec:
               {{- toYaml . | nindent 14 }}
               {{- end }}
           {{- end}}
-          containers:
-            - name: "noop"
-              securityContext:
-                {{- toYaml $.Values.securityContext | nindent 16 }}
-              image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
-              imagePullPolicy: {{ $.Values.image.pullPolicy }}
-              resources:
-                {{- toYaml $.Values.resources | nindent 16 }}
-              command:
-              - "echo"
-              - "noop"
           volumes:
           - name: cache
             persistentVolumeClaim:

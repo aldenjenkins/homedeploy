@@ -17,18 +17,20 @@ repositories:
   url: "https://groundhog2k.github.io/helm-charts/"
 - name: twuni 
   url: "https://helm.twun.io"
+- name: nicholaswilde
+  url: "https://nicholaswilde.github.io/helm-charts/"
+
 helmfiles:
-  - path: 01-metallb/helmfile.yaml
-  - path: 02-external-dns/helmfile.yaml
-  - path: 03-storage/helmfile.yaml
-  - path: 04-ingress/helmfile.yaml
-  - path: 05-cert-manager/helmfile.yaml
-  - path: 06-vpn/helmfile.yaml
-  - path: 07-docker-registry/helmfile.yaml
-  - path: 08-backup/helmfile.yaml
-  - path: 10-media/helmfile.yaml
-  - path: 11-nextcloud/helmfile.yaml
-  - path: 12-gallery/helmfile.yaml
-  - path: 13-paperless/helmfile.yaml
-  - path: 14-recipes/helmfile.yaml
-  
+- path: 01-metallb/helmfile.yaml
+- path: 02-external-dns/helmfile.yaml
+- path: 03-storage/helmfile.yaml
+- path: 04-ingress/helmfile.yaml
+- path: 05-cert-manager/helmfile.yaml
+- path: 06-vpn/helmfile.yaml
+- path: 07-docker-registry/helmfile.yaml
+- path: 08-backup/helmfile.yaml
+- path: 10-media/helmfile.yaml
+- path: 11-nextcloud/helmfile.yaml
+- path: 12-gallery/helmfile.yaml
+- path: 13-paperless/helmfile.yaml
+- path: 14-bookstack/helmfile.yaml

@@ -4,6 +4,7 @@ environments:
       - ../values.yaml
     secrets:
       - ../secrets.yaml
+{{- if .Values.services.transmission.enabled }}
 releases:
   - name: transmission
     namespace: media
@@ -44,3 +45,4 @@ helmfiles:
     enable: true
     host: {{ .Values.storage.server }}
     path: "{{ .Values.paths.media }}"
+{{- end }}

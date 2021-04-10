@@ -48,9 +48,9 @@ releases:
   createNamespace: true
   chart: charts/thumbsup-cron
   values:
-  - image:
-      repository: registry.infra.k8s.home.dkuz.net/thumbsup
-      tag: "v2.15.0"
+  - # image:
+    #   repository: registry.infra.k8s.home.dkuz.net/thumbsup
+    #   tag: "v2.15.0"
     schedule: "0 0 * * *"
     command:
     - "sh"

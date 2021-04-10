@@ -5,6 +5,7 @@ environments:
     secrets:
       - ../secrets.yaml
 helmfiles:
+{{- if .Values.services.sonarr.enabled }}
 - path: common/servarr.yaml
   values:
   - name: sonarr
@@ -12,6 +13,8 @@ helmfiles:
     tag: preview
     volType: nfs
     enableMedia: true
+{{- end }}
+{{- if .Values.services.radarr.enabled }}
 - path: common/servarr.yaml
   values:
   - name: radarr
@@ -19,6 +22,8 @@ helmfiles:
     tag: latest
     volType: nfs
     enableMedia: true
+{{- if .Values.services.bazarr.enabled }}
+{{- end }}
 - path: common/servarr.yaml
   values:
   - name: bazarr
@@ -26,6 +31,8 @@ helmfiles:
     tag: latest
     volType: nfs
     enableMedia: true
+{{- if .Values.services.jackett.enabled }}
+{{- end }}
 - path: common/servarr.yaml
   values:
   - name: jackett
@@ -33,3 +40,4 @@ helmfiles:
     tag: latest
     volType: nfs
     enableMedia: false
+{{- end }}

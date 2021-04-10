@@ -1,0 +1,68 @@
+environments:
+  default:
+    values:
+    - ../values.yaml
+    secrets:
+    - ../secrets.yaml
+releases:
+- name: bookstack
+  namespace: bookstack
+  createNamespace: true
+  chart: nicholaswilde/bookstack
+  values:
+  - secret:
+      DB_DATABASE: {{ .Values.services.bookstack.mariadb.userDatabase }} 
+      DB_USER: {{ .Values.services.bookstack.mariadb.userName }} 
+      DB_PASSWORD: {{ .Values.services.bookstack.mariadb.userPassword }}
+    env:
+      TZ: "{{ .Values.env.timezone }}"
+      PUID: "{{ .Values.users.mediauser.uid }}"
+      PGID: "{{ .Values.users.mediauser.gid }}"
+      DB_HOST: bookstack-db
+      APP_URL: "https://{{ .Values.services.bookstack.hostname }}"
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        kubernetes.io/tls-acme: "true"
+      hosts:
+      - host: {{ .Values.services.bookstack.hostname }}
+        paths:
+        - path: /
+          pathType: Prefix
+      tls:
+      - secretName: bookstack-tls
+        hosts:
+        - {{ .Values.services.bookstack.hostname }}
+    persistence:
+      config:
+        enabled: true
+        existingClaim: bookstack-config-vol
+    probes:
+      readiness:
+        enabled: false
+      liveness:
+        enabled: false
+      startup:
+        enabled: false
+helmfiles:
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: bookstack
+    name: bookstack-mariadb-vol
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.bookstackMariadb }}"
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: bookstack
+    name: bookstack-config-vol
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.bookstackConfig }}"
+- path: ../common/mariadb.helmfile.yaml
+  values:
+  - name: bookstack-db
+    namespace: bookstack
+    pvc: bookstack-mariadb-vol
+    rootPassword: {{ .Values.services.bookstack.mariadb.rootPassword }} 
+    userDatabase: {{ .Values.services.bookstack.mariadb.userDatabase }} 
+    userName: {{ .Values.services.bookstack.mariadb.userName }} 
+    userPassword: {{ .Values.services.bookstack.mariadb.userPassword }}

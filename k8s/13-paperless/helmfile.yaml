@@ -11,8 +11,8 @@ releases:
   chart: k8s-at-home/paperless
   values:
   - image:
-      repository: registry.infra.k8s.home.dkuz.net/paperless-ng
-      tag: sidecar
+      # repository: registry.infra.k8s.home.dkuz.net/paperless-ng
+      tag: "1.2.1"
     env:
       PAPERLESS_TIME_ZONE: {{ .Values.env.timezone }}
       PAPERLESS_CONSUMER_POLLING: "10"

@@ -26,10 +26,8 @@ run_restic () {
     if [ 0 -eq ${PIPESTATUS[0]} ]
     then
         export STATUS="success"
-        export RC=0
     else
         export STATUS="failure"
-        export RC=1
     fi
     telegram -t "${TELEGRAM_TOKEN}" -c "${TELEGRAM_CLIENT}" -f /tmp/execution.txt "${NAME}: backup ${STATUS}"
 }

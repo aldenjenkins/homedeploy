@@ -49,9 +49,3 @@ releases:
     web:
       config:
         adminPassword: {{ .Values.services.wireguard.adminPassword }}
-    nodeSelector:
-      kubernetes.io/hostname: krang
-    tolerations:
-    - effect: NoSchedule
-      key: key
-      value: value

@@ -4,10 +4,13 @@ environments:
       - ../values.yaml
     secrets:
       - ../secrets.yaml
+
+{{- if .Values.services.plex.enabled }}
 releases:
 - name: plex
   namespace: media
   chart: k8s-at-home/plex
+  version: v2.3.1
   values:
   - claimToken: claim-xzsCtyMWdmBJxDGWoL6p
     image:
@@ -57,8 +60,10 @@ releases:
         volume:
           persistentVolumeClaim:
             claimName: plex-media
+{{- end }}
 
 helmfiles:
+{{- if .Values.services.jellyfin.enabled }}
 - path: common/servarr.yaml
   values:
   - name: jellyfin
@@ -66,18 +71,20 @@ helmfiles:
     tag: latest
     volType: nfs
     enableMedia: true
-- path: ../common/hostdir-mount.helmfile.yaml
+{{- end }}
+{{- if .Values.services.plex.enabled }}
+- path: ../common/nfs-mount.helmfile.yaml
   values:
   - namespace: media
     name: plex-config
     enable: true
     host: {{ .Values.storage.server }}
     path: "{{ .Values.paths.mediaConfig}}/plex"
-- path: ../common/hostdir-mount.helmfile.yaml
+- path: ../common/nfs-mount.helmfile.yaml
   values:
   - namespace: media
     name: plex-media
     enable: true
     host: {{ .Values.storage.server }}
     path: "{{ .Values.paths.media }}"
-  
+{{- end }}

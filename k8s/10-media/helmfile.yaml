@@ -1,9 +1,9 @@
 environments:
   default:
     values:
-      - ../values.yaml
+    - ../values.yaml
     secrets:
-      - ../secrets.yaml
+    - ../secrets.yaml
 
 helmfiles:
 - path: 02-torrents.yaml

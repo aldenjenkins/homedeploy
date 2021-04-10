@@ -15,7 +15,7 @@ releases:
     args:
     - /usr/local/etc/redis/redis.conf
     storage:
-      className: {{ .Values.storage.storageClass }}
+      persistentVolumeClaimName: nextcloud-redis
       requestedSize: 1Gi
     redisConfig: |
       requirepass {{ .Values.services.nextcloud.redis.password }}
@@ -84,8 +84,14 @@ releases:
       existingClaim: nextcloud-data
     nginx:
       enabled: true
+    startupProbe:
+      enabled: false
+    readinessProbe:
+      enabled: false
+    livenessProbe:
+      enabled: false
 helmfiles:
-- path: ../common/hostdir-mount.helmfile.yaml
+- path: ../common/nfs-mount.helmfile.yaml
   values:
   - namespace: nextcloud
     name: nextcloud-data
@@ -103,11 +109,23 @@ helmfiles:
     name: nextcloud-paperless
     host: {{ .Values.storage.server }}
     path: "{{ .Values.paths.paperless }}"
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: nextcloud
+    name: nextcloud-redis
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.nextcloudRedis }}"
+- path: ../common/nfs-mount.helmfile.yaml
+  values:
+  - namespace: nextcloud
+    name: nextcloud-mariadb
+    host: {{ .Values.storage.server }}
+    path: "{{ .Values.paths.nextcloudMariadb }}"
 - path: ../common/mariadb.helmfile.yaml
   values:
   - name: mariadb
     namespace: nextcloud
-    storageClass: {{ .Values.storage.storageClass }}
+    pvc: nextcloud-mariadb
     rootPassword: {{ .Values.services.nextcloud.mariadb.rootPassword }} 
     userDatabase: {{ .Values.services.nextcloud.mariadb.userDatabase }} 
     userName: {{ .Values.services.nextcloud.mariadb.userName }} 

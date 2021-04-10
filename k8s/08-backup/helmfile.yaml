@@ -19,6 +19,15 @@ releases:
     - name: primary
       bucket: gcs:{{.Values.backup.gcs.bucket}}/primary
       path: /storage/backup
+    - name: photos-unsorted
+      bucket: gcs:{{.Values.backup.gcs.bucket}}/photos-unsorted
+      path: /storage/files/photos
+    - name: paperless-documents
+      bucket: gcs:{{.Values.backup.gcs.bucket}}/paperless-documents
+      path: /storage/files/paperless
+    - name: dimak-nextcloud
+      bucket: gcs:{{.Values.backup.gcs.bucket}}/dimak-nextcloud
+      path: /storage/files/nextcloud/data/dimak
     rcloneConf: |
       [gcs]
       type = google cloud storage
@@ -39,13 +48,13 @@ releases:
       mountPath: /storage
 
 helmfiles:
-- path: ../common/hostdir-mount.helmfile.yaml
+- path: ../common/nfs-mount.helmfile.yaml
   values:
   - namespace: backup
     name: restic-cache
     host: {{ .Values.storage.server }}
     path: "{{ .Values.paths.backupCache }}"
-- path: ../common/hostdir-mount.helmfile.yaml
+- path: ../common/nfs-mount.helmfile.yaml
   values:
   - namespace: backup
     name: restic-nas
