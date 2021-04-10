@@ -69,7 +69,6 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `nextcloud.existingSecret.smtpPasswordKey`                       | Name of the key that contains the SMTP password         | `nil`                                       |
 | `nextcloud.update`                                           | Trigger update if custom command is used                | `0`                                         |
 | `nextcloud.datadir`                                          | nextcloud data dir location                             | `/var/www/html/data`                        |
-| `nextcloud.tableprefix`                                      | nextcloud db table prefix                               | `''`                                        |
 | `nextcloud.mail.enabled`                                     | Whether to enable/disable email settings                | `false`                                     |
 | `nextcloud.mail.fromAddress`                                 | nextcloud mail send from field                          | `nil`                                       |
 | `nextcloud.mail.domain`                                      | nextcloud mail domain                                   | `nil`                                       |
@@ -106,7 +105,7 @@ The following table lists the configurable parameters of the nextcloud chart and
 | `internalDatabase.database`                                  | Name of the existing database                           | `nextcloud`                                 |
 | `externalDatabase.enabled`                                   | Whether to use external database                        | `false`                                     |
 | `externalDatabase.type`                                      | External database type: `mysql`, `postgresql`           | `mysql`                                     |
-| `externalDatabase.host`                                      | Host of the external database                           | `nil`                                       |
+| `externalDatabase.host`                                      | Host of the external database in form of `host:port`    | `nil`                                       |
 | `externalDatabase.database`                                  | Name of the existing database                           | `nextcloud`                                 |
 | `externalDatabase.user`                                      | Existing username in the external db                    | `nextcloud`                                 |
 | `externalDatabase.password`                                  | Password for the above username                         | `nil`                                       |

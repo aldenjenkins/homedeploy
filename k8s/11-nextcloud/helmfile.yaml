@@ -25,7 +25,7 @@ releases:
   chart: charts/nextcloud
   values:
   - image:
-      tag: "20-fpm"
+      tag: "21-fpm"
     nextcloud:
       host: {{ .Values.services.nextcloud.hostname }}
       username: admin
